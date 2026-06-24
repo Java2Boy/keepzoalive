@@ -20,7 +20,7 @@ jobs:
             --max-time 30 --retry 2 \
             https://fuli.zo.computer/)
           echo "fuli.zo.computer HTTP $STATUS"
-          [ "$STATUS" = "200" ] || exit 1
+          [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ] || exit 1
 
       - name: Ping dns.zo.computer
         id: ping_dns
@@ -30,7 +30,7 @@ jobs:
             --max-time 30 --retry 2 \
             https://dns.zo.computer)
           echo "dns.zo.computer HTTP $STATUS"
-          [ "$STATUS" = "200" ] || exit 1
+          [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ] || exit 1
 
       - name: Ping xox.zo.computer
         id: ping_xox
@@ -40,7 +40,7 @@ jobs:
             --max-time 30 --retry 2 \
             https://xox.zo.computer)
           echo "xox.zo.computer HTTP $STATUS"
-          [ "$STATUS" = "200" ] || exit 1
+          [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ] || exit 1
 
       - name: 🚨 Telegram 失败通知
         if: steps.ping_fuli.outcome == 'failure' || steps.ping_dns.outcome == 'failure' || steps.ping_xox.outcome == 'failure'
@@ -57,8 +57,7 @@ jobs:
           [ "$DNS_OUTCOME"  = "failure" ] && FAILED="${FAILED}%0A%E2%9D%8C dns.zo.computer"
           [ "$XOX_OUTCOME"  = "failure" ] && FAILED="${FAILED}%0A%E2%9D%8C xox.zo.computer"
           TIME=$(date '+%Y-%m-%d %H:%M UTC')
-          MSG="%F0%9F%9A%A8 *zo.computer 保活告警*%0A%0A时间：${TIME}%0A失败站点：${FAILED}%0A%0A查看详情：${RUN_URL}"
+          MSG="%F0%9F%9A%A8 zo.computer 保活告警%0A%0A时间：${TIME}%0A失败站点：${FAILED}%0A%0A查看详情：${RUN_URL}"
           curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
             -d "chat_id=${TG_CHAT}" \
-            -d "text=${MSG}" \
-            -d "parse_mode=Markdown"
+            -d "text=${MSG}"
